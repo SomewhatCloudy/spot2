@@ -126,7 +126,10 @@ class Manager
                 'primary' => false,
                 'index' => false,
                 'unique' => false,
-                'autoincrement' => false
+                'autoincrement' => false,
+                'foreignkey' => true,
+                'onUpdate' => null,
+                'onDelete' => null
             ];
 
             // Type default overrides for specific field types
@@ -269,6 +272,20 @@ class Manager
                     $fieldKeyName = $table . '_' . $fieldInfo['index'];
                 }
                 $tableKeys['index'][$fieldKeyName][] = $fieldName;
+                $usedKeyNames[] = $fieldKeyName;
+            }
+            if ($fieldInfo['fulltext']) {
+
+                // Only add if relevant to stop error
+                if (!isset($tableKeys['fulltext'])) {
+                    $tableKeys['fulltext'] = [];
+                }
+
+                if (is_string($fieldInfo['fulltext'])) {
+                    // Named group
+                    $fieldKeyName = $table . '_' . $fieldInfo['index'];
+                }
+                $tableKeys['fulltext'][$fieldKeyName][] = $fieldName;
                 $usedKeyNames[] = $fieldKeyName;
             }
         }
