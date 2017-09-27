@@ -57,6 +57,7 @@ class Resolver
         // Mapper knows currently set entity
         $entity = $this->mapper->entity();
         $table = $entity::table();
+	    $tableCreated = false;
         $fields = $this->mapper->entityManager()->fields();
         $fieldIndexes = $this->mapper->entityManager()->fieldKeys();
         $connection = $this->mapper->connection();
@@ -76,6 +77,7 @@ class Resolver
         } else {
             // Create new table
             $newSchema = $this->migrateCreateSchema();
+	        $tableCreated = true;
             $queries = $newSchema->toSql($connection->getDatabasePlatform());
         }
 
@@ -84,6 +86,12 @@ class Resolver
         foreach ($queries as $sql) {
             $lastResult = $connection->exec($sql);
         }
+
+	    //
+	    if ($tableCreated)
+	    {
+		    $entity::bootstrap();
+	    }
 
         return $lastResult;
     }
